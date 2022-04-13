@@ -7,7 +7,7 @@ import random
 
 #global var
 ip = "127.0.0.1"
-port_udp = "1781"
+port_udp = "1750"
 
 database = [
         ['mafe', '123'],
@@ -18,6 +18,7 @@ database = [
 
 sessions = []
 sessions_username = []
+placar = []
 
 # def signal_handler(signal, frame):
 #     print("Saindo do servidor")
@@ -29,23 +30,22 @@ sessions_username = []
 #     sys.exit()
 
 def check_rps(one, second):
-    if one == second:
+    if one == "R" and second == "S":
+        return 1
+    elif one == "R" and second == "P":
+        return 2
+    elif one == "S" and second == "R":
+        return 2
+    elif one == "S" and second == "P":
+        return 1
+    elif one == "P" and second == "R":
+        return 1
+    elif one == "P" and second == "S":
+        return 2
+    elif one == second:
         return 0
-    elif one == "R":
-        if second == "P":
-            return 2
-        else:
-            return 1
-    elif one == "P":
-        if second == "S":
-            return 1
-        else:
-            return 2
-    elif one == "S":
-        if second == "R":
-            return 1
-        else:
-            return 2
+    else:
+        return -1
 
 def udp_auth():
 
@@ -82,15 +82,22 @@ def on_new_client(client,addr):
         if data.decode() in sessions_username or ip_conn in sessions:
             index = sessions_username.index(data.decode())
             sessions[index] = str(addr[0])+":"+str(addr[1])
-            print ("Cliente: " + data.decode() + " migrado ao servidor pelo TCP usando o ip: " + str(addr[0])+":"+str(addr[1]))
+            print ("Cliente: " + data.decode() + " conectado TCP pelo ip: " + str(addr[0])+":"+str(addr[1]))
             client.send(str.encode("Bem vindo ao jogo Rock Paper Scissors\nPara jogar digite R para Pedra, P para papel e S para tesoura\nDigite sua jogada: "))
 
             while True:
                 data = client.recv(1024)
                 if not data or data.decode() == "sair":
+                    print("Cliente: " + sessions_username[index] + " desconectado pelo TCP usando o ip: " + str(addr[0])+":"+str(addr[1]))
                     client.send(str.encode("Obrigado por jogar"))
                     client.close()
                     break
+                elif data.decode() == "placar":
+                    placar_show = ""
+                    for i in range(len(placar)):
+                        placar_show += sessions_username[i]+" - "+str(placar[i])+"\n"
+                    client.send(str.encode("Placar: \n" + str(placar_show) +"\nDigite sua nova jogada, ou digite 'sair' para sair:"))
+
                 else:
                     data_decoded = (data.decode()).upper()
                     robot_random = str(random.choice(['R','P','S']))
@@ -127,6 +134,10 @@ def on_new_client(client,addr):
                             print("Cliente: " + sessions_username[index] + " empatou jogada com o computador" + " ("+robot_random_name+")")
                         elif check == 1:
                             retorno += "Você ganhou"
+                            try:
+                                placar[index] += 1
+                            except IndexError:
+                                placar.insert(index, 1)
                             print ("Cliente: " + sessions_username[index]  + " ganhou com " + data_decoded_name + " contra " + robot_random_name)
                         else:
                             retorno += "Você perdeu"

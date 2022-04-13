@@ -9,7 +9,7 @@ name = input("Enter your username: ")
 password = input("Enter your password: ")
 
 server_ip = "127.0.0.1"
-server_port = "1781"
+server_port = "1750"
 port_game = (int(server_port)+1)
 
 
@@ -42,17 +42,24 @@ def game_tcp():
             while True:
                 jogada = input()
                 jogada = jogada.lower()
-                if jogada not in ['r','p','s', 'sair']:
+                if jogada not in ['r','p','s', 'sair', 'placar']:
                     print("Jogada inválida")
                 else:
-                    server_tcp.send(jogada.encode())
-                    data = server_tcp.recv(1024)
-                    print(data.decode())
-    except Exception as e:
+                    if jogada == "sair":
+                        server_tcp.send(jogada.encode())
+                        data = server_tcp.recv(1024)
+                        print(data.decode())
+                        server_tcp.close()
+                        break
+                    else:
+                        server_tcp.send(jogada.encode())
+                        data = server_tcp.recv(1024)
+                        print(data.decode())
+    except:
+        print("Exception")
         #close con
-        print(e)
-        print("Server is not responding")
-        server_tcp.close()
+        # print(e)
+        # print("Server is not responding")
 
 
     # data = input("")
