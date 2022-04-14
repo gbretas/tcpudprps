@@ -9,7 +9,7 @@ name = input("Enter your username: ")
 password = input("Enter your password: ")
 
 server_ip = "127.0.0.1"
-server_port = "1750"
+server_port = "1740"
 port_game = (int(server_port)+1)
 
 
@@ -57,12 +57,7 @@ def game_tcp():
                         print(data.decode())
     except:
         print("Exception")
-        #close con
-        # print(e)
-        # print("Server is not responding")
 
-
-    # data = input("")
     
 
 if __name__ == "__main__":

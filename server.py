@@ -7,7 +7,7 @@ import random
 
 #global var
 ip = "127.0.0.1"
-port_udp = "1750"
+port_udp = "1740"
 
 database = [
         ['mafe', '123'],
@@ -20,14 +20,6 @@ sessions = []
 sessions_username = []
 placar = []
 
-# def signal_handler(signal, frame):
-#     print("Saindo do servidor")
-#     sessions_save = open("sessions.txt", "w")
-#     index = 0
-#     for i in sessions:
-#         sessions_save.write(i+" "+sessions_username[index]+"\n")
-#         index+=1
-#     sys.exit()
 
 def check_rps(one, second):
     if one == "R" and second == "S":
@@ -152,9 +144,6 @@ def on_new_client(client,addr):
             client.send(str.encode("Cliente sem permissão para acessar o sistema"))
             client.close()
 
-
-        
-
 def rock_paper_scissors():
     server_tcp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     server_tcp.bind((ip,int(port_udp)+1))
@@ -163,20 +152,8 @@ def rock_paper_scissors():
         c, addr = server_tcp.accept()     # Establish connection with client.
         threading.Thread(target=on_new_client,args=(c,addr)).start()
 
-   
-
-
-        # while True:
-        #     data = client.recv(1024)
-        #     if not data:
-        #         break
-        #     print(data.decode())
-        #     client.send(str.encode("Obrigado por jogar"))
-        #     client.close()
-
 
 if __name__ == "__main__":
-    # signal.signal(signal.SIGINT, signal_handler)
 
     print("Iniciando o servidor de autenticação UDP em Threading")
     x = threading.Thread(target=udp_auth, args=())
